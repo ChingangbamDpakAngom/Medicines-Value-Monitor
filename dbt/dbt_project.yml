@@ -1,0 +1,12 @@
+name: medicines_value_monitor
+version: "1.0.0"
+profile: medicines_value_monitor
+
+models:
+  medicines_value_monitor:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: table
+    marts:
+      +materialized: table

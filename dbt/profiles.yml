@@ -1,0 +1,8 @@
+# Run dbt from the dbt/ directory; paths are relative to it.
+medicines_value_monitor:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../data/warehouse.duckdb
+      threads: 4
