@@ -28,11 +28,14 @@ flowchart LR
 
 ## Data source
 
-- Dataset: `english-prescribing-data-epd` on `opendata.nhsbsa.net` (one CSV per month, `EPD_YYYYMM`, ~17M rows / ~6 GB each, from 2014-01).
-- Resource URLs come from `https://opendata.nhsbsa.net/api/3/action/package_show?id=english-prescribing-data-epd`, never hard-coded.
-- Grain: practice × BNF presentation × month. Key measures: `ITEMS`, `QUANTITY`, `TOTAL_QUANTITY`, `NIC`, `ACTUAL_COST`.
-- **Schema drift:** older months use `STP_NAME/STP_CODE`, and newer months use `ICB_NAME/ICB_CODE` (the July 2022 change). Staging normalises both to `icb_*`.
-- Check before building: NHSBSA has published newer months under a separate SNOMED-coded EPD dataset. Confirm which dataset holds the latest months, and keep the dataset id in one config value.
+- Dataset: `english-prescribing-dataset-epd-with-snomed-code` on `opendata.nhsbsa.net`. It has one CSV per month (`EPD_SNOMED_YYYYMM`), runs from 2020-11, and each month is ~18.6M rows / ~7.7 GB. The older `english-prescribing-data-epd` stops at 2025-06, so we don't use it.
+- Resource URLs are discovered via `package_show` (`DATASET` constant in `ingest/epd.py`), never hard-coded.
+- Grain: practice × BNF presentation × SNOMED code × month.
+  - Key columns: `YEAR_MONTH` (`YYYY-MM`), `ICB_CODE`, `PRACTICE_CODE`, `BNF_PRESENTATION_CODE`, `SNOMED_CODE`.
+  - Measures: `ITEMS`, `QUANTITY`, `TOTAL_QUANTITY`, `ADQ_USAGE`, `NIC`, `ACTUAL_COST`.
+- Unidentified prescribing appears as `PRACTICE_CODE = '-'` with `UNIDENTIFIED = 'Y'`.
+- Ingest keeps all codes as text (preserving leading zeros) and casts only the measures to DOUBLE.
+- **Schema drift:** months before July 2022 may use `STP_*` instead of `ICB_*`. We haven't checked, because the first 3 months are all ICB-era. Handle it in staging when backfilling.
 
 ## Repo layout
 
