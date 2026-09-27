@@ -37,7 +37,7 @@ COPY (
 **Iteration 1 → 2: download-then-convert → streaming.** This is the most interesting story in this phase.
 - **v1** downloaded each CSV to disk (with resumable HTTP `Range` requests), converted it, then deleted it. Peak disk use was ~9 GB per month.
 - The laptop had ~27 GB free, which was tight for 3 months plus everything else.
-- **v2** lets DuckDB read the CSV over HTTP and write Parquet directly. The only disk used is the output, roughly 1 GB per month (see the numbers below).
+- **v2** lets DuckDB read the CSV over HTTP and write Parquet directly. The only disk used is the output: 315 MB for July 2026.
 - **What we gave up:** resume within a month. If the connection drops, that month restarts from zero. Finished months are still skipped, so the cost is at most one month's re-download. That's an acceptable trade for a monthly batch job.
 
 **`all_varchar=true`, then cast only the measures**
@@ -47,7 +47,7 @@ COPY (
 
 **Parquet + ZSTD instead of keeping the CSV**
 - **Columnar:** queries read only the columns they need.
-- **Compressed:** roughly 8–15× smaller than the CSV.
+- **Compressed:** 25× smaller than the CSV here (7.8 GB → 315 MB). Repetitive text columns such as practice and ICB names compress extremely well.
 - **Typed:** it stores its own schema.
 - **Fast filtering:** it keeps min/max statistics per row group, so a query can skip chunks that can't match its filter (predicate pushdown).
 
@@ -79,7 +79,9 @@ The live API discovery was checked manually: 69 months were found (2020-11 → 2
 
 | Month | Rows | Parquet size | Time |
 |---|---|---|---|
-| 2026-07 | _pending_ | _pending_ | _pending_ |
+| 2026-07 | 18,601,776 (matches the portal's own count exactly) | 315 MB (vs 7.8 GB CSV, **25× smaller**) | ~28 min |
+
+July 2026 totals: 9,284 practices, 37 ICBs, 21,422 distinct presentations, 113.4M items, £1,044.6M NIC (£1,000.6M actual cost).
 
 ## Concepts to know
 
@@ -97,7 +99,7 @@ The live API discovery was checked manually: 69 months were found (2020-11 → 2
 - It's idempotent (finished months are skipped), types are explicit, and nothing lands on disk except the compressed output.
 
 **Q: You changed the design mid-phase. Why?**
-The first version downloaded the full 7.7 GB CSV before converting, needing ~9 GB of scratch space per month, which was tight on my laptop. I switched to streaming, cutting disk to ~1 GB per month. The cost was losing resume-within-a-month. That's fine for a monthly batch where a retry costs at most one month.
+The first version downloaded the full 7.7 GB CSV before converting, needing ~9 GB of scratch space per month, which was tight on my laptop. I switched to streaming, cutting disk use to the 315 MB Parquet output. The cost was losing resume-within-a-month. That's fine for a monthly batch where a retry costs at most one month.
 
 **Q: How would you make this production-grade?**
 - Write to object storage (S3 or ADLS) instead of local disk.
