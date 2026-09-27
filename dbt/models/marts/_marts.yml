@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: mart_branded_savings
+    description: Potential saving from generic prescribing. Grain month x practice x generic equivalent.
+    data_tests:
+      - unique:
+          column_name: "concat_ws('|', month, practice_code, generic_equiv_code)"
+    columns:
+      - name: potential_saving
+        data_tests: [not_null]
+
+  - name: mart_low_value
+    description: Spend on NHSE low-priority items. Grain month x practice x category.
+    data_tests:
+      - unique:
+          column_name: "concat_ws('|', month, practice_code, category)"
+
+  - name: dim_practice
+    columns:
+      - name: practice_code
+        data_tests: [unique, not_null]
+
+  - name: dim_icb
+    columns:
+      - name: icb_code
+        data_tests: [unique, not_null]
+
+  - name: mart_icb_monthly
+    description: Headline table for the dashboard. Grain month x ICB.
+    data_tests:
+      - unique:
+          column_name: "concat_ws('|', month, icb_code)"
+    columns:
+      - name: icb_name
+        data_tests: [not_null]

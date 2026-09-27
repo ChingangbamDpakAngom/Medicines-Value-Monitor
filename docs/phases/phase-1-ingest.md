@@ -79,7 +79,10 @@ The live API discovery was checked manually: 69 months were found (2020-11 → 2
 
 | Month | Rows | Parquet size | Time |
 |---|---|---|---|
+| 2026-05 | 18,000,093 | 303 MB | ~28 min |
+| 2026-06 | 18,374,449 | 311 MB | ~27 min |
 | 2026-07 | 18,601,776 (matches the portal's own count exactly) | 315 MB (vs 7.8 GB CSV, **25× smaller**) | ~28 min |
+| **Total** | **54,976,318** | **929 MB** | |
 
 July 2026 totals: 9,284 practices, 37 ICBs, 21,422 distinct presentations, 113.4M items, £1,044.6M NIC (£1,000.6M actual cost).
 

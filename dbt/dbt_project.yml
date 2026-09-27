@@ -19,3 +19,8 @@ seeds:
         bnf_code_like: varchar
         is_exclusion: boolean
         note: varchar
+    brand_exceptions:
+      +column_types:
+        bnf_code_like: varchar
+        drug: varchar
+        reason: varchar

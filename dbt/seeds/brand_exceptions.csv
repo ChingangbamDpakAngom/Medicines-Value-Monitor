@@ -1,0 +1,23 @@
+bnf_code_like,drug,reason
+0301%,inhaled bronchodilators,Inhaler devices differ; BTS/NICE advise prescribing inhalers by brand
+0302%,inhaled corticosteroids,Inhaler devices differ; BTS/NICE advise prescribing inhalers by brand
+060101%,insulins,Biological medicines; MHRA advises prescribing by brand
+0408010C0%,carbamazepine,MHRA category 1 antiepileptic: maintain a specific manufacturer's product
+0408010N0%,phenobarbital,MHRA category 1 antiepileptic
+0408010P0%,phenobarbital sodium,MHRA category 1 antiepileptic
+0408010Q0%,phenytoin sodium,MHRA category 1 antiepileptic
+0408010Z0%,phenytoin,MHRA category 1 antiepileptic
+0408010U0%,primidone,MHRA category 1 antiepileptic
+0802020G0%,ciclosporin (systemic),Narrow therapeutic index; MHRA advises prescribing by brand
+0802020T0%,tacrolimus (oral),Narrow therapeutic index; MHRA advises prescribing by brand
+0402030K0%,lithium carbonate,Narrow therapeutic index; BNF advises keeping the same brand
+0402030P0%,lithium citrate,Narrow therapeutic index; BNF advises keeping the same brand
+0301030S0%,theophylline,Modified-release; BNF advises prescribing by brand
+0206020C0%,diltiazem,Modified-release preparations not interchangeable; BNF advises prescribing by brand
+0206020R0%,nifedipine,Modified-release preparations not interchangeable; BNF advises prescribing by brand
+0105010B0%,mesalazine,Release mechanisms differ between brands; BNF advises prescribing by brand
+0404000M0%,methylphenidate,Modified-release profiles differ; prescribe by brand
+0407020A0%,fentanyl,Transdermal patches prescribed by brand; IR forms tracked as low-value instead
+0407020B0%,buprenorphine (analgesic),Transdermal patches prescribed by brand
+0410030A0%,buprenorphine (dependence),Formulations (sublingual/oral lyophilisate/depot) not interchangeable
+0109040N0%,pancreatin,Enzyme content differs between brands; BNF advises prescribing by brand

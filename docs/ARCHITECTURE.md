@@ -79,11 +79,14 @@ docs/ARCHITECTURE.md
 
 **Seeds** are small hand-curated CSVs checked into git.
 - `low_value_medicines.csv`: `category, bnf_code_like, is_exclusion, note`. It has 86 rules covering 21 of NHS England's 23 categories. Codes come from OpenPrescribing's published measure definitions; categories they define through dm+d were matched to codes using our own data. Bath/shower emollients and insulin pen needles are left out (their rules are based on product names or prices).
-- `brand_exceptions.csv`: `bnf_prefix, reason`.
+- `brand_exceptions.csv`: `bnf_code_like, drug, reason`. It has 22 rules, each tied to published guidance: inhalers (BTS/NICE), insulins (MHRA biologics), MHRA category 1 antiepileptics, ciclosporin/tacrolimus, lithium, modified-release theophylline/diltiazem/nifedipine/mesalazine/methylphenidate, fentanyl/buprenorphine, and pancreatin. Whole chemicals are excluded, which is conservative: it can only under-state savings.
 
 **Tests**
-- Generic tests: `not_null` and `unique` on mart grains, and `nic >= 0`.
-- One singular test checks that `sum(nic)` in `stg_epd` equals raw Parquet per month, so rows can't silently drop.
+- Generic tests: `not_null` on key staging columns; `unique` on every mart grain (as a `concat_ws` expression, so no dbt_utils dependency).
+- Singular tests:
+  - `assert_icb_monthly_reconciles_to_staging`: headline NIC equals staging NIC per month, to the penny.
+  - `assert_low_value_rules_do_not_overlap`: no presentation matches two inclusion rules, so nothing is double counted.
+- 27 checks in total; `dbt build` takes ~1 min over 55M rows.
 
 ## Key decisions
 

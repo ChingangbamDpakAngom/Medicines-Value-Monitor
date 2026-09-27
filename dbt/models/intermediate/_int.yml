@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: int_generic_unit_price
+    description: Median practice price per unit for each generic presentation per month.
+    data_tests:
+      - unique:
+          column_name: "concat_ws('|', month, generic_code)"
+    columns:
+      - name: generic_price_per_unit
+        data_tests: [not_null]
