@@ -35,6 +35,10 @@ meta:
 
 ## Profiling findings (July 2026)
 
+The full, re-runnable investigation is in [`notebooks/01_profiling.ipynb`](../../notebooks/01_profiling.ipynb). It uses DuckDB over all 3 months, with outputs saved so it reads on GitHub. It also proves `TOTAL_QUANTITY = ITEMS × QUANTITY` on all 54,976,318 rows, shows that the only duplicates left after adding quantity are pooled unidentified prescribing (63 groups), and covers the hive-partition gotcha.
+
+**Why a notebook for profiling but not for cleaning:** exploration is iterative and visual, so a notebook suits it. Cleaning must be repeatable, tested and reusable, so it lives in dbt. The notebook is the *evidence*, and `stg_epd.sql` holds the *rules*.
+
 This is where most of the value in this phase came from. Each finding changed the design.
 
 | # | Finding | Evidence | Impact |
@@ -44,6 +48,7 @@ This is where most of the value in this phase came from. Each finding changed th
 | 3 | **Branded spend with a generic equivalent is large** | £330M of £410M branded drug NIC (80%) has an equivalent generic that is also prescribed. It's concentrated in ch. 06 (endocrine) and ch. 03 (respiratory) | Much of it is legitimate brand prescribing (inhalers, insulins, modified-release) or priced the same as the generic. Savings must use the **price difference**, and phase 3 needs a brand-exceptions list |
 | 4 | Unidentified prescribing is tiny | 15,017 rows, £0.6M (0.06%) | Kept, and flagged `is_unidentified`, so ICB totals still reconcile |
 | 5 | No negative costs; 411 rows with NIC = 0 | | No cleaning needed; zero-cost rows are valid |
+| 6 | **Hive-partition gotcha:** reading `year_month=202607/` folders makes DuckDB silently replace `YEAR_MONTH` (`'2026-07'`) with the folder value (`202607`) | Notebook section 0 | Always read with `hive_partitioning=false` |
 
 The totals for sanity checks: 9,284 practices, 37 ICBs, 21,422 presentations, 113.4M items, £1,044.6M NIC.
 
@@ -76,6 +81,7 @@ Seed column types are pinned in `dbt_project.yml` so dbt can never misread a cod
 - **BNF code anatomy:** chapter (2), section (2), paragraph (2), sub-paragraph (1), chemical (2), product (2: `AA` = generic), strength/form (2), generic equivalent (2).
 - **NIC vs actual cost:** NIC (net ingredient cost) is the list price of the drug. Actual cost is what the NHS paid after discounts and fees. Cost comparisons use NIC because it's consistent across practices.
 - **Data profiling:** row counts, distinct counts, null and negative checks, duplicate checks, distributions by category.
+- **Notebook vs pipeline:** notebooks are for exploration and communication. Pipelines (dbt) are for anything that must run the same way every time.
 
 ## Interview questions
 
