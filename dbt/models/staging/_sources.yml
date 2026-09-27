@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: epd
+    description: Raw monthly EPD Parquet written by ingest/epd.py
+    tables:
+      - name: epd_raw
+        meta:
+          external_location: "read_parquet('../data/raw/epd/*/epd.parquet', hive_partitioning=false)"

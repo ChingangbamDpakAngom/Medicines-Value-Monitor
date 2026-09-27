@@ -1,0 +1,87 @@
+category,bnf_code_like,is_exclusion,note
+aliskiren,0205053A0%,false,
+amiodarone,0203020D0%,false,
+co-proxamol,0407010Q0%,false,
+dosulepin,0403010J0%,false,
+dronedarone,0203020X0%,false,
+homeopathy,190203%,false,
+lidocaine plasters,1502010J0%EL,false,5% medicated plasters only
+liothyronine,0602010M0%,false,
+liothyronine,0602010Z0%,false,levothyroxine + liothyronine combination
+minocycline for acne,0501030P0%,false,
+omega-3 fatty acids,0212000AB%,false,
+omega-3 fatty acids,0212000V0%,false,
+oxycodone + naloxone,0407020AF%,false,
+rubefacients,1003020%,false,excluding topical NSAIDs and capsaicin below
+rubefacients,1003020AD%,true,arnica
+rubefacients,1003020AA%,true,capsaicin
+rubefacients,1003020AF%,true,diclofenac diethylammonium
+rubefacients,1003020U0%,true,diclofenac sodium
+rubefacients,1003020M0%,true,felbinac
+rubefacients,1003020W0%,true,heparinoid
+rubefacients,1003020P0%,true,ibuprofen
+rubefacients,1003020L0%,true,kaolin
+rubefacients,100302010%,true,ketoprofen
+rubefacients,1003020R0%,true,piroxicam
+silk garments,2020%,false,
+travel vaccines,1404000G0%,false,hepatitis B
+travel vaccines,1404000AS%,false,Japanese encephalitis (imported)
+travel vaccines,1404000AR%,false,Japanese encephalitis
+travel vaccines,1404000X0%,false,meningococcal ACWY
+travel vaccines,1404000U0%,false,yellow fever
+travel vaccines,1404000AA%,false,tick-borne encephalitis
+travel vaccines,1404000N0%,false,rabies
+travel vaccines,0802040X0%,false,BCG
+trimipramine,0403010Y0%,false,
+lutein and antioxidants,091200000BEJYFS,false,
+lutein and antioxidants,091200000BEXXFR,false,
+lutein and antioxidants,091200000BFSIA0,false,
+lutein and antioxidants,091200000BFWUFT,false,
+lutein and antioxidants,091200000BFWVFT,false,
+lutein and antioxidants,091000000BBWVBU,false,
+lutein and antioxidants,091000000BBWJA0,false,
+lutein and antioxidants,091000000BBWHA0,false,
+lutein and antioxidants,190500000BBDPA0,false,
+lutein and antioxidants,190500000BBDYA0,false,
+lutein and antioxidants,091000000BBVXBT,false,
+lutein and antioxidants,091000000BBXRBT,false,
+lutein and antioxidants,091000000BBVGBT,false,
+lutein and antioxidants,091000000BBVFBT,false,
+lutein and antioxidants,091000000BBTPBU,false,
+lutein and antioxidants,091200000BFXRFT,false,
+lutein and antioxidants,091000000BBWYBT,false,
+lutein and antioxidants,091000000BBWPBT,false,
+lutein and antioxidants,091000000BBVTBT,false,
+lutein and antioxidants,091000000BBWQBT,false,
+lutein and antioxidants,091000000BBWWBT,false,
+lutein and antioxidants,091000000BBWSBT,false,
+lutein and antioxidants,091000000BBVSBT,false,
+lutein and antioxidants,091000000BBWXBU,false,
+lutein and antioxidants,091000000BBVRBT,false,
+lutein and antioxidants,091000000BBWNBT,false,
+lutein and antioxidants,091000000BBVQBT,false,
+lutein and antioxidants,091000000BBUQBT,false,
+lutein and antioxidants,091000000BBUSBT,false,
+fentanyl immediate release,0407020A0%AI,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AJ,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AK,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AL,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AP,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AW,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AX,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AY,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%AZ,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BA,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BB,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BC,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BD,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BE,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BJ,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%BP,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+fentanyl immediate release,0407020A0%CH,false,matched on generic-equivalent suffix (lozenge/sublingual/buccal/nasal)
+tramadol + paracetamol,040702040%AU,false,tablets (generic + brands via equivalent suffix)
+tramadol + paracetamol,040702040%BA,false,effervescent tablets
+glucosamine and chondroitin,1001050A0%,false,
+herbal treatments,1305010I0%,false,gamolenic acid only (dm+d herbal licence not available)
+perindopril arginine,0205051Y0%,false,
+perindopril arginine,0205051Z0%,false,with diuretic

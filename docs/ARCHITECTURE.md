@@ -30,9 +30,10 @@ flowchart LR
 
 - Dataset: `english-prescribing-dataset-epd-with-snomed-code` on `opendata.nhsbsa.net`. It has one CSV per month (`EPD_SNOMED_YYYYMM`), runs from 2020-11, and each month is ~18.6M rows / ~7.7 GB. The older `english-prescribing-data-epd` stops at 2025-06, so we don't use it.
 - Resource URLs are discovered via `package_show` (`DATASET` constant in `ingest/epd.py`), never hard-coded.
-- Grain: practice × BNF presentation × SNOMED code × month.
+- Grain: practice × BNF presentation × SNOMED code × **quantity per item** × month. The source splits a practice's prescriptions for one drug by prescription size (e.g. 2 items × 60 and 4 items × 30), so rows are not unique on the codes alone.
   - Key columns: `YEAR_MONTH` (`YYYY-MM`), `ICB_CODE`, `PRACTICE_CODE`, `BNF_PRESENTATION_CODE`, `SNOMED_CODE`.
-  - Measures: `ITEMS`, `QUANTITY`, `TOTAL_QUANTITY`, `ADQ_USAGE`, `NIC`, `ACTUAL_COST`.
+  - Measures: `ITEMS`, `QUANTITY` (**per item**), `TOTAL_QUANTITY` (= items × quantity; the real volume), `ADQ_USAGE`, `NIC`, `ACTUAL_COST`.
+- Drug codes are 15 characters (chapters 01–19). Appliances and dressings (chapters 20–23, ~10% of rows, ~£150M/month) use 11-character codes with no generic structure.
 - Unidentified prescribing appears as `PRACTICE_CODE = '-'` with `UNIDENTIFIED = 'Y'`.
 - Ingest keeps all codes as text (preserving leading zeros) and casts only the measures to DOUBLE.
 - **Schema drift:** months before July 2022 may use `STP_*` instead of `ICB_*`. We haven't checked, because the first 3 months are all ICB-era. Handle it in staging when backfilling.
@@ -56,27 +57,28 @@ docs/ARCHITECTURE.md
 
 ## Models
 
-**`stg_epd`** is a view over `read_parquet('data/raw/epd/*/*.parquet', hive_partitioning=true)`. It:
-- lowercases column names, casts types, and coalesces `stp_*`/`icb_*` into `icb_*`
+**`stg_epd`** is a view over `read_parquet('../data/raw/epd/*/epd.parquet', hive_partitioning=false)`. The path is relative to `dbt/`. It:
+- renames columns to snake_case, parses `month` as a date, and renames `QUANTITY` → `quantity_per_item`
+- flags `is_drug` (15-character code in chapters 01–19); the generic fields are NULL for non-drugs
 - derives the BNF code parts (15 characters):
   - `chemical_code` = chars 1–9
   - `product_code` = chars 10–11
   - `is_generic` = `product_code = 'AA'`
   - `generic_equiv_code` = chemical_code + `'AA'` + chars 14–15 + chars 14–15. This is the same rule OpenPrescribing uses.
 
-**`int_generic_unit_price`** gives, per month and per generic BNF code, the median `nic / quantity` across practices. Using the median stops outlier practices from setting the reference price.
+**`int_generic_unit_price`** gives, per month and per generic BNF code, the median `nic / total_quantity` across practices. Using the median stops outlier practices from setting the reference price.
 
 **Marts**
 
 | Model | Grain | Logic |
 |---|---|---|
 | `dim_practice`, `dim_icb` | practice / ICB | Latest name/address per code |
-| `mart_branded_savings` | practice × generic_equiv_code × month | Branded rows joined to the generic unit price. `saving = greatest(nic − quantity × generic_unit_price, 0)`. Excludes `brand_exceptions` seed rows (e.g. modified-release, narrow-therapeutic-index drugs, where prescribing by brand is correct) |
-| `mart_low_value` | practice × category × month | EPD joined to the `low_value_medicines` seed on BNF chemical/prefix → items and cost |
+| `mart_branded_savings` | practice × generic_equiv_code × month | Branded rows joined to the generic unit price. `saving = greatest(nic − total_quantity × generic_unit_price, 0)`. Excludes `brand_exceptions` seed rows (e.g. modified-release, narrow-therapeutic-index drugs, where prescribing by brand is correct) |
+| `mart_low_value` | practice × category × month | EPD joined to the `low_value_medicines` seed with `bnf_code LIKE bnf_code_like`, minus exclusion rules → items and cost |
 | `mart_icb_monthly` | ICB × month | Rolls both marts up for the dashboard |
 
 **Seeds** are small hand-curated CSVs checked into git.
-- `low_value_medicines.csv`: `bnf_prefix, category, source_url`, built from the NHSE guidance.
+- `low_value_medicines.csv`: `category, bnf_code_like, is_exclusion, note`. It has 86 rules covering 21 of NHS England's 23 categories. Codes come from OpenPrescribing's published measure definitions; categories they define through dm+d were matched to codes using our own data. Bath/shower emollients and insulin pen needles are left out (their rules are based on product names or prices).
 - `brand_exceptions.csv`: `bnf_prefix, reason`.
 
 **Tests**

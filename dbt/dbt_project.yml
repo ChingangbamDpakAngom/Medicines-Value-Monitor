@@ -10,3 +10,12 @@ models:
       +materialized: table
     marts:
       +materialized: table
+
+seeds:
+  medicines_value_monitor:
+    low_value_medicines:
+      +column_types:
+        category: varchar
+        bnf_code_like: varchar
+        is_exclusion: boolean
+        note: varchar

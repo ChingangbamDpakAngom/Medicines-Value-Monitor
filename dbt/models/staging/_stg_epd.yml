@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: stg_epd
+    description: Typed, renamed EPD rows with derived BNF generic flags.
+    columns:
+      - name: month
+        data_tests: [not_null]
+      - name: practice_code
+        data_tests: [not_null]
+      - name: bnf_code
+        data_tests: [not_null]
+      - name: items
+        data_tests: [not_null]
+      - name: nic
+        data_tests: [not_null]
