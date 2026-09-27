@@ -18,6 +18,6 @@ cd dbt && ../.venv/Scripts/dbt debug
 
 ```bash
 .venv/Scripts/python ingest/epd.py --months 3      # ~30 min per month, ~310 MB Parquet each
-cd dbt && ../.venv/Scripts/dbt build && cd ..      # 29 models/tests, ~1 min
+cd dbt && ../.venv/Scripts/dbt build && cd ..      # 32 models, seeds and tests, ~1 min
 .venv/Scripts/streamlit run app/streamlit_app.py   # dashboard at http://localhost:8501
 ```
