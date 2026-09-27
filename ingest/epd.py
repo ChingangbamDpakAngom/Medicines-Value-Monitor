@@ -27,32 +27,19 @@ def list_months() -> dict[str, str]:
     return months
 
 
-def download(url: str, dest: Path) -> None:
-    """Stream to dest, resuming a partial .part file if one exists."""
-    part = dest.with_suffix(".part")
-    done = part.stat().st_size if part.exists() else 0
-    headers = {"Range": f"bytes={done}-"} if done else {}
-    with requests.get(url, headers=headers, stream=True, timeout=120) as r:
-        if r.status_code == 416:  # already fully downloaded
-            part.rename(dest)
-            return
-        r.raise_for_status()
-        mode = "ab" if r.status_code == 206 else "wb"
-        with open(part, mode) as f:
-            for chunk in r.iter_content(chunk_size=8 << 20):
-                f.write(chunk)
-    part.rename(dest)
+def to_parquet(src: str, out: Path) -> int:
+    """Stream a CSV (local path or URL, never saved to disk) to ZSTD Parquet. Returns row count.
 
-
-def to_parquet(csv: Path, out: Path) -> int:
-    """Read everything as text (no type guessing), cast measures to DOUBLE, write ZSTD Parquet. Returns row count."""
+    Everything is read as text (no type guessing); only measures are cast to DOUBLE. Address lines are dropped.
+    """
     casts = ", ".join(f"CAST({c} AS DOUBLE) AS {c}" for c in NUMERIC)
     tmp = out.with_suffix(".tmp")
     con = duckdb.connect()
     con.execute(
-        f"COPY (SELECT * REPLACE ({casts}) FROM read_csv(?, header=true, all_varchar=true)) "
+        f"COPY (SELECT * EXCLUDE (ADDRESS_1, ADDRESS_2, ADDRESS_3, ADDRESS_4) REPLACE ({casts}) "
+        f"FROM read_csv(?, header=true, all_varchar=true)) "
         f"TO '{tmp.as_posix()}' (FORMAT parquet, COMPRESSION zstd)",
-        [str(csv)],
+        [src],
     )
     rows = con.execute("SELECT count(*) FROM read_parquet(?)", [tmp.as_posix()]).fetchone()[0]
     tmp.rename(out)
@@ -71,14 +58,9 @@ def main() -> None:
             print(f"{ym}: exists, skipping")
             continue
         out.parent.mkdir(parents=True, exist_ok=True)
-        csv = out.parent / "epd.csv"
-        if not csv.exists():
-            print(f"{ym}: downloading")
-            download(months[ym], csv)
-        print(f"{ym}: converting")
-        rows = to_parquet(csv, out)
-        csv.unlink()
-        print(f"{ym}: {rows:,} rows -> {out}")
+        print(f"{ym}: streaming {months[ym]}")
+        rows = to_parquet(months[ym], out)
+        print(f"{ym}: {rows:,} rows -> {out} ({out.stat().st_size / 1e6:,.0f} MB)")
 
 
 if __name__ == "__main__":
