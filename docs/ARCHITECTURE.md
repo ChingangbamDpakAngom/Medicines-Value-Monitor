@@ -50,9 +50,12 @@ dbt/
   models/intermediate/     # int_generic_unit_price
   models/marts/            # fct_*, dim_*, mart_*
   tests/                   # singular tests (reconciliation)
-app/streamlit_app.py
+app/streamlit_app.py       # dashboard: reads mart tables only, read-only
+notebooks/01_profiling.ipynb  # exploration evidence behind the staging rules
+tests/                     # test_ingest.py, test_app.py (plain asserts, runnable directly)
 data/                      # gitignored: raw parquet + warehouse.duckdb
 docs/ARCHITECTURE.md
+docs/phases/               # per-phase study write-ups
 ```
 
 ## Models
@@ -76,6 +79,8 @@ docs/ARCHITECTURE.md
 | `mart_branded_savings` | practice × generic_equiv_code × month | Branded rows joined to the generic unit price. `saving = greatest(nic − total_quantity × generic_unit_price, 0)`. Excludes `brand_exceptions` seed rows (e.g. modified-release, narrow-therapeutic-index drugs, where prescribing by brand is correct) |
 | `mart_low_value` | practice × category × month | EPD joined to the `low_value_medicines` seed with `bnf_code LIKE bnf_code_like`, minus exclusion rules → items and cost |
 | `mart_icb_monthly` | ICB × month | Rolls both marts up for the dashboard |
+| `mart_practice_monthly` | practice × month | Same headline figures per practice, for the dashboard drill-down |
+| `dim_bnf` | presentation | Latest name, chemical and chapter per BNF code (drug names for the dashboard) |
 
 **Seeds** are small hand-curated CSVs checked into git.
 - `low_value_medicines.csv`: `category, bnf_code_like, is_exclusion, note`. It has 86 rules covering 21 of NHS England's 23 categories. Codes come from OpenPrescribing's published measure definitions; categories they define through dm+d were matched to codes using our own data. Bath/shower emollients and insulin pen needles are left out (their rules are based on product names or prices).

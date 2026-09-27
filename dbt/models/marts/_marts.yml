@@ -34,3 +34,14 @@ models:
     columns:
       - name: icb_name
         data_tests: [not_null]
+
+  - name: dim_bnf
+    columns:
+      - name: bnf_code
+        data_tests: [unique, not_null]
+
+  - name: mart_practice_monthly
+    description: Practice-level headline figures for drill-down. Grain month x practice.
+    data_tests:
+      - unique:
+          column_name: "concat_ws('|', month, icb_code, practice_code)"
