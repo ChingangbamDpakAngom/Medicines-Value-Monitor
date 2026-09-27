@@ -96,6 +96,8 @@ docs/ARCHITECTURE.md
 
 ## Phased plan
 
+Each finished phase has a study write-up in [`docs/phases/`](phases/) covering decisions, trade-offs, concepts and interview Q&A.
+
 | Phase | Deliverable | Done when |
 |---|---|---|
 | **0. Scaffold** | `pyproject.toml`/`requirements.txt` (duckdb, dbt-duckdb, pandas, streamlit, requests), `.gitignore` for `data/` | `dbt debug` passes |
