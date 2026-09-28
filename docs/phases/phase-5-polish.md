@@ -62,6 +62,24 @@ Recruiters and interviewers give a repo about 30 seconds, so the README puts thi
 
 The CI badge shows the pipeline is live, and each layer links to its phase doc for depth.
 
+## The first CI run failed, and how it was debugged
+
+The first push went red at **`pip install`**, before any project code ran. The job logs need a GitHub login, so the failure was reproduced locally instead, one hypothesis at a time:
+
+1. **Are the versions compatible?** `uv pip compile --python-platform linux` resolved cleanly. The pins were fine.
+2. **Does pip (not uv) resolve them?** A native `pip install --dry-run` succeeded, so pip's resolver was fine too.
+3. **Does every package have a Linux wheel?** `pip download --platform manylinux… --only-binary=:all:` for each dependency: all had one.
+4. **What else runs at install time on Linux?** `dbt-core 1.12` added a dependency, `dbt-core-experimental-parser`, published only as a *source* package. Its build step **downloads a platform binary from a GitHub release during `pip install`**. It was the one Linux-only moving part in the install.
+
+**Fix: pin `dbt-core==1.11.9`**, the last version without that dependency. The project uses nothing from 1.12. After the pin, a strict wheels-only resolve for Linux/Python 3.12 passes, meaning nothing is built or downloaded outside PyPI. Both the fixture build and the full 55M-row build were re-run: 32/32.
+
+Lessons:
+- **Reproduce CI locally when logs aren't available.** Simulate the target platform (`--platform`, `--python-version`) and remove hypotheses one at a time.
+- **Newest isn't always best for a pipeline dependency.** Prefer versions whose install is plain wheels. Fewer moving parts means fewer ways for CI to break, and less supply-chain surface: a build step that fetches binaries at install time bypasses the package index.
+- **Pinning exact versions** (phase 0) made this debuggable: the failure was deterministic, not "something changed upstream".
+
+Also bumped: `actions/checkout@v5` and `actions/setup-python@v6`, because GitHub deprecated Node 20 for the older versions.
+
 ## A correction found in this phase
 
 While exporting, `dim_icb` showed 37 rows, but one is the unidentified `-` code: **there are 36 ICBs**. The docs had said "37 ICBs" in four places, because `count(distinct icb_code)` silently included the placeholder. All four were corrected.
@@ -76,6 +94,11 @@ While exporting, `dim_icb` showed 37 rows, but one is the unidentified `-` code:
 - **Sampling by entity vs by row:** keeps aggregates within an entity valid.
 
 ## Interview questions
+
+**Q: Tell me about a CI failure you debugged.**
+- The first run failed at `pip install`, and I couldn't read the logs.
+- I reproduced it locally by simulating Linux + Python 3.12 with pip's platform flags, and ruled out hypotheses in order: version conflicts, then the pip resolver, then missing Linux wheels.
+- What was left was a new transitive dependency of dbt-core 1.12 that downloads a binary from GitHub during installation. I pinned dbt-core 1.11.9, verified that a strict wheels-only install works, and re-ran the full build.
 
 **Q: How do you test a pipeline whose real input is 23 GB?**
 - With a committed fixture: complete rows for 4 real practices across 3 months, 1.6 MB.

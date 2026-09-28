@@ -6,7 +6,7 @@
 
 | File | Purpose |
 |---|---|
-| `requirements.txt` | Exact pinned versions: duckdb 1.5.5, dbt-core 1.12.5, dbt-duckdb 1.11.0, pandas 3.0.6, streamlit 1.64.0, requests 2.34.2 |
+| `requirements.txt` | Exact pinned versions: duckdb 1.5.5, dbt-core 1.11.9 (downgraded from 1.12.5 in phase 5; see there), dbt-duckdb 1.11.0, pandas 3.0.6, streamlit 1.64.0, requests 2.34.2 |
 | `.python-version` | `3.12`, which tells `uv` which interpreter to use |
 | `dbt/dbt_project.yml` | Project config. Staging models build as **views**; intermediate and marts build as **tables** |
 | `dbt/profiles.yml` | Connection: a DuckDB file at `data/warehouse.duckdb` |
