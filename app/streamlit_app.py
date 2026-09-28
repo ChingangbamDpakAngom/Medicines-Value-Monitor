@@ -3,13 +3,14 @@
 Run: streamlit run app/streamlit_app.py   (after `dbt build` has created data/warehouse.duckdb)
 Reads only mart tables, read-only.
 """
+import os
 from pathlib import Path
 
 import altair as alt
 import duckdb
 import streamlit as st
 
-DB = Path(__file__).resolve().parents[1] / "data" / "warehouse.duckdb"
+DB = os.environ.get("DUCKDB_PATH") or Path(__file__).resolve().parents[1] / "data" / "warehouse.duckdb"
 SAVING_COLOUR = "#2a78d6"     # categorical slot 1 (blue)
 LOW_VALUE_COLOUR = "#eb6834"  # categorical slot 2 (orange)
 ANTIEPILEPTICS = "0408010"    # MHRA category 2 drugs sit here: flag for clinical review, don't auto-switch

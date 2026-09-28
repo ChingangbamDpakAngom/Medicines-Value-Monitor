@@ -117,7 +117,13 @@ Each finished phase has a study write-up in [`docs/phases/`](phases/) covering d
 | **4. App** | `app/streamlit_app.py`: KPI tiles, ICB league table, month trend, practice drill-down | Runs locally from `streamlit run`; <2s per interaction |
 | **5. Polish** | Power BI export, GitHub Actions `dbt build` on a small fixture, README with screenshots, optional backfill | CI green; README tells the story |
 
-## Run (target)
+## Configuration and CI
+
+- `EPD_GLOB` (the raw Parquet glob) and `DUCKDB_PATH` (the warehouse file) are environment variables. Their defaults are the local paths, so nothing needs setting for normal use.
+- `.github/workflows/ci.yml` builds everything on `tests/fixtures/epd/` on every push and pull request: a real 77k-row sample of 4 practices × 3 months. It runs the ingest test, `dbt build` (all models and tests) and the dashboard smoke test.
+- `scripts/export_marts.py` writes the marts and dimensions to `data/export/*.parquet` for Power BI.
+
+## Run
 
 ```bash
 python ingest/epd.py --months 3

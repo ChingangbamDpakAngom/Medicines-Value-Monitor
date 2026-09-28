@@ -6,4 +6,4 @@ sources:
     tables:
       - name: epd_raw
         meta:
-          external_location: "read_parquet('../data/raw/epd/*/epd.parquet', hive_partitioning=false)"
+          external_location: "read_parquet('{{ env_var('EPD_GLOB', '../data/raw/epd/*/epd.parquet') }}', hive_partitioning=false)"

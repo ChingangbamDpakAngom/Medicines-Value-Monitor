@@ -50,7 +50,7 @@ This is where most of the value in this phase came from. Each finding changed th
 | 5 | No negative costs; 411 rows with NIC = 0 | | No cleaning needed; zero-cost rows are valid |
 | 6 | **Hive-partition gotcha:** reading `year_month=202607/` folders makes DuckDB silently replace `YEAR_MONTH` (`'2026-07'`) with the folder value (`202607`) | Notebook section 0 | Always read with `hive_partitioning=false` |
 
-The totals for sanity checks: 9,284 practices, 37 ICBs, 21,422 presentations, 113.4M items, £1,044.6M NIC.
+The totals for sanity checks: 9,283 practices and 36 ICBs (plus the unidentified `-` code), 21,422 presentations, 113.4M items, £1,044.6M NIC.
 
 ## The low-value medicines seed
 

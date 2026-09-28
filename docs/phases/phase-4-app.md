@@ -15,7 +15,7 @@ cd dbt && ../.venv/Scripts/dbt build && cd ..
 |---|---|
 | Sidebar filters | Month (latest by default) and ICB ("All England" or one ICB) |
 | KPI tiles | Total spend, potential generic saving (with % of spend), low-value spend (with £ per £1k) |
-| **Where** | All England: the 37 ICBs ranked by saving per £1,000 spent. One ICB: its top 25 practices, with a minimum-spend slider |
+| **Where** | All England: the 36 ICBs ranked by saving per £1,000 spent. One ICB: its top 25 practices, with a minimum-spend slider |
 | **Which drugs** | Top 15 drugs by potential saving. Antiepileptics labelled "(review)" |
 | **Low-value items** | Spend by NHS England category |
 | **Trend** | Saving per £1k and low-value spend per £1k by month, as two separate charts |
@@ -51,7 +51,7 @@ These come from a data-visualisation checklist, and each is a common mistake avo
 
 **Found by looking at the rendered app, not by tests:**
 - Every other ICB label was hidden because rows were too tight. Fixed with more row height and `labelOverlap=False`.
-- "NHS … INTEGRATED CARE BOARD" repeated on all 37 names, eating label space. It's stripped in one SQL expression, shared by the dropdown and the chart.
+- "NHS … INTEGRATED CARE BOARD" repeated on all 36 names, eating label space. It's stripped in one SQL expression, shared by the dropdown and the chart.
 - The KPI badges showed a green "↑" arrow, which reads as "went up". But they're ratios, not changes, so the arrow was removed.
 - The antiepileptic "needs review" flag was only in the table, yet lamotrigine *tops* the chart. The flag was moved into the chart label.
 

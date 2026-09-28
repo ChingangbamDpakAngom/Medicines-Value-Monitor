@@ -4,5 +4,5 @@ medicines_value_monitor:
   outputs:
     dev:
       type: duckdb
-      path: ../data/warehouse.duckdb
+      path: "{{ env_var('DUCKDB_PATH', '../data/warehouse.duckdb') }}"
       threads: 4
