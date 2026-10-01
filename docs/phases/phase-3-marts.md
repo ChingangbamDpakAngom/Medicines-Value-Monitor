@@ -12,9 +12,10 @@
 stg_epd ──┬─> int_generic_unit_price ──┐
           │   brand_exceptions (seed) ─┼─> mart_branded_savings ──┐
           ├───────────────────────────-┘                          │
-          │   low_value_medicines (seed) ──> mart_low_value ──────┼─> mart_icb_monthly
-          ├─> dim_icb ────────────────────────────────────────────┘
-          └─> dim_practice
+          │   low_value_medicines (seed) ──> mart_low_value ──────┤
+          ├─> dim_practice ───────────────────────────────────────┤
+          ├─────────────── (practice totals) ─────────────────────┴─> mart_practice_monthly ──┐
+          └─> dim_icb ─────────────────────────────────────────────────────────────────────────┴─> mart_icb_monthly
 ```
 
 | Model | Grain | What it does |

@@ -68,8 +68,11 @@ On macOS/Linux use `.venv/bin/` instead of `.venv/Scripts/`.
 To try it without the 23 GB download, build on the bundled sample:
 
 ```bash
-cd dbt && EPD_GLOB="$(pwd)/../tests/fixtures/epd/*/epd.parquet" ../.venv/Scripts/dbt build
+cd dbt && EPD_GLOB="$(pwd -W)/../tests/fixtures/epd/*/epd.parquet" ../.venv/Scripts/dbt build   # Windows (Git Bash)
+cd dbt && EPD_GLOB="$(pwd)/../tests/fixtures/epd/*/epd.parquet" ../.venv/bin/dbt build          # macOS/Linux
 ```
+
+This overwrites `data/warehouse.duckdb`. To keep your full build, also set `DUCKDB_PATH` to another file.
 
 ## Limitations
 
