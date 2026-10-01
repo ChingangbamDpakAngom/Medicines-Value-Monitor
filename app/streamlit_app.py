@@ -56,8 +56,7 @@ with st.sidebar:
     month = st.selectbox("Month", months, format_func=lambda d: d.strftime("%B %Y"))
     icb_name = st.selectbox("ICB", ["All England", *icbs["icb_name"]])
 icb = None if icb_name == "All England" else icbs.loc[icbs["icb_name"] == icb_name, "icb_code"].item()
-scope = "icb_code = ?" if icb else "true"
-scope_params = (icb,) if icb else ()
+scope = "icb_code = coalesce(?, icb_code)"  # NULL param = All England
 
 st.title("Medicines Value Monitor")
 st.caption(
@@ -69,7 +68,7 @@ st.caption(
 k = query(
     f"select sum(nic) nic, sum(potential_saving) saving, sum(low_value_nic) low_value "
     f"from mart_icb_monthly where month = ? and {scope}",
-    (month, *scope_params),
+    (month, icb),
 ).iloc[0]
 c1, c2, c3 = st.columns(3)
 c1.metric("Total spend (NIC)", gbp(k.nic))
@@ -85,33 +84,26 @@ with where_tab:
     if icb is None:
         st.subheader("ICBs ranked by potential saving per £1,000 spent")
         df = query(
-            f"select {SHORT_ICB} as icb_name, saving_per_1000_nic, potential_saving, low_value_per_1000_nic, nic "
+            f"select {SHORT_ICB} as name, saving_per_1000_nic, potential_saving, low_value_per_1000_nic, nic "
             "from mart_icb_monthly where month = ? and icb_code <> '-' order by saving_per_1000_nic desc",
             (month,),
-        )
-        st.altair_chart(
-            bar(df, "saving_per_1000_nic:Q", "icb_name:N", SAVING_COLOUR, "£ potential saving per £1,000 spend",
-                [alt.Tooltip("icb_name:N", title="ICB"),
-                 alt.Tooltip("saving_per_1000_nic:Q", title="£ per £1k", format=",.2f"),
-                 alt.Tooltip("potential_saving:Q", title="Saving £", format=",.0f")]),
-            width="stretch",
         )
     else:
         st.subheader(f"Practices in {icb_name} ranked by potential saving per £1,000 spent")
         min_spend = st.slider("Minimum practice spend (£k), to hide very small practices", 0, 200, 20, 10)
         df = query(
-            "select practice_name, postcode, saving_per_1000_nic, potential_saving, low_value_per_1000_nic, nic "
+            "select practice_name as name, postcode, saving_per_1000_nic, potential_saving, low_value_per_1000_nic, nic "
             "from mart_practice_monthly where month = ? and icb_code = ? and practice_code <> '-' and nic >= ? "
             "order by saving_per_1000_nic desc limit 25",
             (month, icb, min_spend * 1000),
         )
-        st.altair_chart(
-            bar(df, "saving_per_1000_nic:Q", "practice_name:N", SAVING_COLOUR, "£ potential saving per £1,000 spend",
-                [alt.Tooltip("practice_name:N", title="Practice"),
-                 alt.Tooltip("saving_per_1000_nic:Q", title="£ per £1k", format=",.2f"),
-                 alt.Tooltip("potential_saving:Q", title="Saving £", format=",.0f")]),
-            width="stretch",
-        )
+    st.altair_chart(
+        bar(df, "saving_per_1000_nic:Q", "name:N", SAVING_COLOUR, "£ potential saving per £1,000 spend",
+            [alt.Tooltip("name:N", title="ICB" if icb is None else "Practice"),
+             alt.Tooltip("saving_per_1000_nic:Q", title="£ per £1k", format=",.2f"),
+             alt.Tooltip("potential_saving:Q", title="Saving £", format=",.0f")]),
+        width="stretch",
+    )
     with st.expander("Table view"):
         st.dataframe(df, hide_index=True, width="stretch")
 
@@ -123,16 +115,15 @@ with drugs_tab:
         select coalesce(b.bnf_name, s.generic_equiv_code)
                    || case when starts_with(s.generic_equiv_code, '{ANTIEPILEPTICS}') then ' (review)' else '' end as drug,
                sum(s.potential_saving) as potential_saving,
-               sum(s.nic)              as branded_spend,
-               starts_with(s.generic_equiv_code, '{ANTIEPILEPTICS}') as needs_clinical_review
+               sum(s.nic)              as branded_spend
         from mart_branded_savings s
         left join dim_bnf b on b.bnf_code = s.generic_equiv_code
-        where s.month = ? and {scope.replace('icb_code', 's.icb_code')}
+        where s.month = ? and s.icb_code = coalesce(?, s.icb_code)
         group by all
         order by potential_saving desc
         limit 15
         """,
-        (month, *scope_params),
+        (month, icb),
     )
     st.altair_chart(
         bar(df, "potential_saving:Q", "drug:N", SAVING_COLOUR, "£ potential saving",
@@ -154,7 +145,7 @@ with low_tab:
     df = query(
         f"select category, sum(items) as items, sum(nic) as spend from mart_low_value "
         f"where month = ? and {scope} group by 1 order by spend desc",
-        (month, *scope_params),
+        (month, icb),
     )
     st.altair_chart(
         bar(df, "spend:Q", "category:N", LOW_VALUE_COLOUR, "£ spend",
@@ -173,7 +164,7 @@ with trend_tab:
         f"select month, 1000 * sum(potential_saving) / sum(nic) as saving_per_1k, "
         f"1000 * sum(low_value_nic) / sum(nic) as low_value_per_1k "
         f"from mart_icb_monthly where {scope} group by 1 order by 1",
-        scope_params,
+        (icb,),
     )
     left, right = st.columns(2)  # two charts, never two y-axes on one
     for col, field, colour, title in [

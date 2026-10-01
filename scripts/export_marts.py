@@ -20,8 +20,7 @@ def main() -> None:
     con = duckdb.connect(str(DB), read_only=True)
     for t in TABLES:
         path = OUT / f"{t}.parquet"
-        con.execute(f"COPY {t} TO '{path.as_posix()}' (FORMAT parquet)")
-        rows = con.execute(f"SELECT count(*) FROM {t}").fetchone()[0]
+        rows = con.execute(f"COPY {t} TO '{path.as_posix()}' (FORMAT parquet)").fetchone()[0]
         print(f"{t}: {rows:,} rows -> {path} ({path.stat().st_size / 1e6:,.1f} MB)")
 
 

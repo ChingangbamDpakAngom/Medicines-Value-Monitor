@@ -22,8 +22,8 @@ stg_epd ──┬─> int_generic_unit_price ──┐
 | `int_generic_unit_price` | month × generic presentation | Reference price per unit: each practice's own price (`sum(nic) / sum(total_quantity)`), then the **median** across practices |
 | `mart_branded_savings` | month × practice × generic equivalent | Branded spend vs. the same quantity at the generic price. `saving = greatest(nic − total_quantity × price, 0)`. Excludes brand-exception drugs |
 | `mart_low_value` | month × practice × category | Spend matching the low-value rules, minus exclusion rules |
-| `dim_practice`, `dim_icb` | practice / ICB | Latest name, postcode and region (`arg_max(..., month)`) |
-| `mart_icb_monthly` | month × ICB | Headline table: totals, savings, low-value spend, plus rates **per £1,000 of spend** |
+| `dim_practice`, `dim_icb` | practice / ICB | Latest name, postcode and parent code (`arg_max(..., month)`). ICB name and region live only in `dim_icb` |
+| `mart_icb_monthly` | month × ICB | Headline table rolled up from `mart_practice_monthly`: spend, savings, low-value spend, plus rates **per £1,000 of spend** |
 
 ## Results (May–July 2026)
 

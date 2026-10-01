@@ -19,12 +19,7 @@ NUMERIC = ["QUANTITY", "ITEMS", "TOTAL_QUANTITY", "ADQ_USAGE", "NIC", "ACTUAL_CO
 def list_months() -> dict[str, str]:
     """{'YYYYMM': csv_url} for every monthly resource in the dataset."""
     resources = requests.get(API, params={"id": DATASET}, timeout=60).json()["result"]["resources"]
-    months = {}
-    for r in resources:
-        m = re.fullmatch(r"EPD_SNOMED_(\d{6})", r["name"])
-        if m:
-            months[m[1]] = r["url"]
-    return months
+    return {m[1]: r["url"] for r in resources if (m := re.fullmatch(r"EPD_SNOMED_(\d{6})", r["name"]))}
 
 
 def to_parquet(src: str, out: Path) -> int:
@@ -35,13 +30,12 @@ def to_parquet(src: str, out: Path) -> int:
     casts = ", ".join(f"CAST({c} AS DOUBLE) AS {c}" for c in NUMERIC)
     tmp = out.with_suffix(".tmp")
     con = duckdb.connect()
-    con.execute(
+    rows = con.execute(
         f"COPY (SELECT * EXCLUDE (ADDRESS_1, ADDRESS_2, ADDRESS_3, ADDRESS_4) REPLACE ({casts}) "
         f"FROM read_csv(?, header=true, all_varchar=true)) "
         f"TO '{tmp.as_posix()}' (FORMAT parquet, COMPRESSION zstd)",
         [src],
-    )
-    rows = con.execute("SELECT count(*) FROM read_parquet(?)", [tmp.as_posix()]).fetchone()[0]
+    ).fetchone()[0]
     tmp.rename(out)
     return rows
 

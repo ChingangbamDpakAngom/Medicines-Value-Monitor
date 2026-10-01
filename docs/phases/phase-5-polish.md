@@ -85,6 +85,17 @@ Also bumped: `actions/checkout@v5` and `actions/setup-python@v6`, because GitHub
 While exporting, `dim_icb` showed 37 rows, but one is the unidentified `-` code: **there are 36 ICBs**. The docs had said "37 ICBs" in four places, because `count(distinct icb_code)` silently included the placeholder. All four were corrected.
 - **Lesson:** check what a distinct count includes before quoting it. Placeholder codes ('-', 'UNKNOWN', 0) inflate counts.
 
+## Simplification review
+
+A review hunting only for over-engineering removed 48 lines without changing any number:
+- `mart_icb_monthly` now rolls up `mart_practice_monthly` instead of re-aggregating staging and both marts. That's one fewer 55M-row scan, and ICB totals are the sum of practice totals by construction. Before/after comparison on all 111 ICB-months: identical to floating-point rounding.
+- Because of that, the practice mart now joins savings and low-value spend on `(month, icb_code, practice_code)`. Otherwise a practice listed under two ICBs in one month would double-count when rolled up.
+- Columns nothing read were dropped: `practices`, `items`, `region_name`, `branded_nic_with_generic` and `low_value_items` from the ICB mart, and ICB name and region from `dim_practice` (they're one join away in `dim_icb`, which is the star-schema way).
+- In the app: one chart call for both drill-down levels, and the ICB filter became `icb_code = coalesce(?, icb_code)`. A NULL parameter means All England, which replaces string-built SQL.
+- `COPY ... TO` already returns the rows written, so the separate `count(*)` queries were deleted. Unused `nbformat` and `nbclient` were removed from the requirements.
+
+**Lesson:** unused columns in a mart are a contract nobody signed. Add them when a report needs them.
+
 ## Concepts to know
 
 - **CI (continuous integration):** automatically build and test every change, so breakage is caught at the commit that caused it.

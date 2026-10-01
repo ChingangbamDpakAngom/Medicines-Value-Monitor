@@ -78,7 +78,7 @@ docs/phases/               # per-phase study write-ups
 | `dim_practice`, `dim_icb` | practice / ICB | Latest name/address per code |
 | `mart_branded_savings` | practice × generic_equiv_code × month | Branded rows joined to the generic unit price. `saving = greatest(nic − total_quantity × generic_unit_price, 0)`. Excludes `brand_exceptions` seed rows (e.g. modified-release, narrow-therapeutic-index drugs, where prescribing by brand is correct) |
 | `mart_low_value` | practice × category × month | EPD joined to the `low_value_medicines` seed with `bnf_code LIKE bnf_code_like`, minus exclusion rules → items and cost |
-| `mart_icb_monthly` | ICB × month | Rolls both marts up for the dashboard |
+| `mart_icb_monthly` | ICB × month | Rolls `mart_practice_monthly` up to ICB for the dashboard |
 | `mart_practice_monthly` | practice × month | Same headline figures per practice, for the dashboard drill-down |
 | `dim_bnf` | presentation | Latest name, chemical and chapter per BNF code (drug names for the dashboard) |
 
