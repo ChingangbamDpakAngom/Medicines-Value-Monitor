@@ -4,11 +4,12 @@ Usage: python ingest/epd.py --months 3
 Output: data/raw/epd/year_month=YYYYMM/epd.parquet (existing months are skipped).
 """
 import argparse
+import json
 import re
 from pathlib import Path
+from urllib.request import urlopen
 
 import duckdb
-import requests
 
 DATASET = "english-prescribing-dataset-epd-with-snomed-code"
 API = "https://opendata.nhsbsa.net/api/3/action/package_show"
@@ -18,7 +19,7 @@ NUMERIC = ["QUANTITY", "ITEMS", "TOTAL_QUANTITY", "ADQ_USAGE", "NIC", "ACTUAL_CO
 
 def list_months() -> dict[str, str]:
     """{'YYYYMM': csv_url} for every monthly resource in the dataset."""
-    resources = requests.get(API, params={"id": DATASET}, timeout=60).json()["result"]["resources"]
+    resources = json.load(urlopen(f"{API}?id={DATASET}", timeout=60))["result"]["resources"]
     return {m[1]: r["url"] for r in resources if (m := re.fullmatch(r"EPD_SNOMED_(\d{6})", r["name"]))}
 
 

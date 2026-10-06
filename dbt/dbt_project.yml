@@ -13,14 +13,6 @@ models:
 
 seeds:
   medicines_value_monitor:
-    low_value_medicines:
-      +column_types:
-        category: varchar
-        bnf_code_like: varchar
-        is_exclusion: boolean
-        note: varchar
-    brand_exceptions:
-      +column_types:
-        bnf_code_like: varchar
-        drug: varchar
-        reason: varchar
+    # BNF codes are text: a pattern without '%' would otherwise be read as a number and lose its leading zero
+    +column_types:
+      bnf_code_like: varchar

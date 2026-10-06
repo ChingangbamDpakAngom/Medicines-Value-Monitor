@@ -121,7 +121,7 @@ Each finished phase has a study write-up in [`docs/phases/`](phases/) covering d
 
 - `EPD_GLOB` (the raw Parquet glob) and `DUCKDB_PATH` (the warehouse file) are environment variables. Their defaults are the local paths, so nothing needs setting for normal use.
 - `.github/workflows/ci.yml` builds everything on `tests/fixtures/epd/` on every push and pull request: a real 77k-row sample of 4 practices × 3 months. It runs the ingest test, `dbt build` (all models and tests) and the dashboard smoke test.
-- `scripts/export_marts.py` writes the marts and dimensions to `data/export/*.parquet` for Power BI.
+- DuckDB's `EXPORT DATABASE 'data/export' (FORMAT parquet)` writes every table to `data/export/*.parquet` for Power BI (command in the README).
 
 ## Run
 

@@ -38,7 +38,7 @@ NHSBSA open-data API ──> ingest/epd.py ──> Parquet (1 file/month, 7.8 GB
 | Layer | What it does | Details |
 |---|---|---|
 | Ingest | Streams each monthly CSV from the API straight into Parquet. Nothing raw touches the disk | [phase 1](docs/phases/phase-1-ingest.md) |
-| Profiling | Notebook that established what a row *means* before any logic was written | [notebook](notebooks/01_profiling.ipynb) · [phase 2](docs/phases/phase-2-staging.md) |
+| Profiling | Notebook that established what a row *means* before any logic was written | [notebook](notebooks/01_profiling.ipynb) (`pip install ipykernel` to re-run) · [phase 2](docs/phases/phase-2-staging.md) |
 | Staging | Typed, renamed view. Derives generic flags from the BNF code structure | [phase 2](docs/phases/phase-2-staging.md) |
 | Marts | Median generic reference price, savings with guidance-backed brand exceptions, low-value spend | [phase 3](docs/phases/phase-3-marts.md) |
 | Dashboard | ICB → practice drill-down, top drugs, low-value categories, trend | [phase 4](docs/phases/phase-4-app.md) |
@@ -60,7 +60,7 @@ uv venv --python 3.12 .venv && uv pip install -r requirements.txt
 .venv/Scripts/python ingest/epd.py --months 3      # ~30 min per month, ~310 MB Parquet each
 cd dbt && ../.venv/Scripts/dbt build && cd ..      # 32 models, seeds and tests, ~1 min
 .venv/Scripts/streamlit run app/streamlit_app.py   # dashboard at http://localhost:8501
-.venv/Scripts/python scripts/export_marts.py       # optional: Parquet for Power BI -> data/export/
+.venv/Scripts/python -c "import duckdb; duckdb.connect('data/warehouse.duckdb', read_only=True).execute(\"EXPORT DATABASE 'data/export' (FORMAT parquet)\")"   # optional: Parquet for Power BI -> data/export/
 ```
 
 On macOS/Linux use `.venv/bin/` instead of `.venv/Scripts/`.

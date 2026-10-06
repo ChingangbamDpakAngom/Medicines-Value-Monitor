@@ -118,7 +118,7 @@ with drugs_tab:
                sum(s.nic)              as branded_spend
         from mart_branded_savings s
         left join dim_bnf b on b.bnf_code = s.generic_equiv_code
-        where s.month = ? and s.icb_code = coalesce(?, s.icb_code)
+        where s.month = ? and {scope}
         group by all
         order by potential_saving desc
         limit 15

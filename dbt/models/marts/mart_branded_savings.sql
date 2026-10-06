@@ -23,7 +23,6 @@ with branded as (
 select
     b.*,
     p.generic_price_per_unit,
-    b.total_quantity * p.generic_price_per_unit                        as generic_cost,
     greatest(b.nic - b.total_quantity * p.generic_price_per_unit, 0)   as potential_saving
 from branded b
 join {{ ref('int_generic_unit_price') }} p

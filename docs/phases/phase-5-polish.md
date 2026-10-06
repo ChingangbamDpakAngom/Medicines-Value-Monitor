@@ -39,7 +39,7 @@ It was simulated locally before pushing, with the same environment variables and
 
 ## 4. Power BI export
 
-`scripts/export_marts.py` writes the 7 mart and dimension tables to `data/export/*.parquet` (~77 MB, mostly the practice × drug savings detail).
+DuckDB's `EXPORT DATABASE 'data/export' (FORMAT parquet)` writes every table to `data/export/*.parquet` (~77 MB, mostly the practice × drug savings detail): the 7 marts and dimensions Power BI needs, plus the seeds and the intermediate price table. It started as a 28-line script looping `COPY` over a table list; the built-in statement does the same job.
 
 To use them in Power BI Desktop:
 1. **Get Data → Parquet**, and load each file.
